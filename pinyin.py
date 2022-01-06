@@ -46,8 +46,6 @@ def process(inputfile):
     return s
 
 def gen(title, s, output):
-    from reportlab.platypus import SimpleDocTemplate, Table
-    from reportlab.lib.styles import getSampleStyleSheet
     from reportlab.pdfbase import pdfmetrics
     from reportlab.pdfbase.ttfonts import TTFont
     pdfmetrics.registerFont(TTFont('song', 'Songti.ttc'))
