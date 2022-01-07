@@ -96,26 +96,6 @@ def gen(title, s, output):
         i = i + 1
     c.save()
 
-    # 调用模板，创建指定名称的PDF文档
-    # doc = SimpleDocTemplate(output + '.pdf')
-    # 获得模板表格
-    # styles = getSampleStyleSheet()
-    # 指定模板
-    # style = styles['Normal']
-    # style.fontName = 'Hei'
-    # 初始化内容
-    # story =[]
-
-    # 初始化表格内容
-    # data= s
-
-    # 根据内容创建表格
-    # t = Table(data)
-    # 将表格添加到内容中
-    # story.append(t)
-    # 将内容输出到PDF中
-    # doc.build(story)
-
 if __name__ == '__main__':
     inputname = sys.argv[1]
     outputname = sys.argv[2]
