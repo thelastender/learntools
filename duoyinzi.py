@@ -3,11 +3,11 @@
 
 import os, io, sys
 
-fn = os.getcwd() + os.sep + 'duoyinzi.dict'
 
 d = {}
 
 def init():
+    fn = os.getcwd() + os.sep + 'duoyinzi.dict'
     with io.open(fn, 'r', encoding='utf-8') as f:
         line = f.readline().strip()
         while line:
@@ -16,12 +16,49 @@ def init():
             line = f.readline().strip()
     # print(len(d))
 
+def init3():
+    fn = os.getcwd() + os.sep + 'duoyinzi3.dict'
+    with io.open(fn, 'r', encoding='utf-8') as f:
+        line = f.readline().strip()
+        while line:
+            s = line.split(':')
+            ss = s[1:]
+            d[s[0]] = dict(map(lambda x:(x[0], ' '.join(x[1:])) , map(lambda x:x.split(' '), ss)))
+            line = f.readline().strip()
+    # print(d)
+
+def translate(fn2, fn3):
+    import re
+    dd = {}
+    with io.open(fn2, 'r', encoding='utf-8') as f:
+        line = f.readline().strip()
+        reg = re.compile(r'【(\w+)】([^【]+)')
+        while line:
+            result = reg.findall(line)
+            z = line[0]
+            # print(z, result)
+            dd[z] = {}
+            for it in result:
+                dd[z][it[0]] = it[1].strip()
+            line = f.readline().strip()
+    # print(dd)
+    with io.open(fn3, 'w', encoding='utf-8') as f:
+        for k, v in dd.items():
+            f.write(k)
+            for p, ws in v.items():
+                f.write(':')
+                f.write(p)
+                f.write(' ' + ws)
+            f.write('\n')
+
 def process(inputfile):
     s = {}
     with io.open(inputfile, 'r', encoding='utf-8') as f:
         l = f.readline().strip()
         while l:
             s[l] = d.get(l, None)
+            if s[l] is None:
+                raise Exception('无法找到 %s，请往字典里加入' % l)
             l = f.readline().strip()
     return s
 
@@ -75,6 +112,7 @@ def gen(title, s, output, with_result=False):
                 c.setFontSize(title_font_size)
                 c.drawString(width / 2 - len(outputname) * character_step / 2, top, '%s' % outputname)
                 c.setFontSize(content_font_size)
+        # print(k, v)
         h = word_height * len(v)
         line_step = max(line_step, h)
         c.drawString(x, y + (h - word_height) / 2 , k)
@@ -105,12 +143,18 @@ def gen(title, s, output, with_result=False):
     c.save()
 
 if __name__ == '__main__':
-    inputname = sys.argv[1]
-    outputname = sys.argv[2]
-    with_result = False
-    if len(sys.argv) > 3:
-        with_result = bool(int(sys.argv[3]))
+    if len(sys.argv) < 3:
+        fn2 = os.getcwd() + os.sep + 'duoyinzi2.dict'
+        fn = os.getcwd() + os.sep + 'duoyinzi3.dict'
+        # translate(fn2, fn)
+    elif len(sys.argv) >= 3:
+        inputname = sys.argv[1]
+        outputname = sys.argv[2]
+        with_result = False
+        if len(sys.argv) > 3:
+            with_result = bool(int(sys.argv[3]))
 
-    init()
-    s = process(inputname)
-    gen(outputname, s, outputname, with_result)
+        init()
+        init3()
+        s = process(inputname)
+        gen(outputname, s, outputname, with_result)
