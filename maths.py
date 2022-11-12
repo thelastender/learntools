@@ -114,25 +114,25 @@ def list_equation4(count):
             b1 = "妈妈又给了他"
             t2 = random.randint(n1, n2)
             if random.random() < 0.5:
-                b2 = "妈妈又给了他"
+                b2 = "等到出门的时候妈妈又再次给了他"
                 t3 = random.randint(n1, n2)
             else:
-                b2 = "花了"
+                b2 = "他买苹果花了"
                 t3 = random.randint(n1, t1 + t2)
         else:
-            b1 = "花了"
+            b1 = "买苹果花了"
             t2 = random.randint(n1, t1)
             if random.random() < 0.5:
                 b2 = "妈妈又给了他"
                 t3 = random.randint(n1, n2)
             else:
-                b2 = "花了"
+                b2 = "买葡萄花了"
                 t3 = random.randint(min(t1 - t2, n1), t1 - t2)
-        b3 = random.choice(("小明还剩的钱是", "小明花了的钱数是", "小明比一开始少的钱数是", "妈妈一共给了小明的钱是"))
+        b3 = random.choice(("小明现在有的钱数是", "小明花了的钱数是", "妈妈给小明的钱数是"))
 
-        s = "" + str(i + 1) + ". 小明拿" + str(t1) + "元去买水果，"
-        s += "第一次" + b1 + str(t2) + "元，" + "第二次" + b2 + str(t3) + "元，"
-        s += b3 + " （        ）"
+        s = "" + str(i + 1) + ". 小明准备拿自己的" + str(t1) + "元去买水果，"
+        s += "" + b1 + str(t2) + "元，" + "" + b2 + str(t3) + "元，"
+        s += b3 + "（        ）"
         print(s)
 
 def list_equation5(count):
@@ -226,7 +226,7 @@ if __name__ == "__main__":
     print("三、填空")
     list_equation3(10)
     print("四、填空")
-    list_equation4(10)
+    list_equation4(12)
     print("五、填空")
     list_equation5(10)
     print("六、填空")
