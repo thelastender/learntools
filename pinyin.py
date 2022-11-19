@@ -48,7 +48,7 @@ def process(inputfile):
 def gen(title, s, output):
     from reportlab.pdfbase import pdfmetrics
     from reportlab.pdfbase.ttfonts import TTFont
-    pdfmetrics.registerFont(TTFont('song', 'Songti.ttc'))
+    pdfmetrics.registerFont(TTFont('song', 'ZiTiGuanJiaKaiTi-1.ttf'))
     from reportlab.pdfgen.canvas import Canvas
     from reportlab.lib.pagesizes import A4
     width, height = A4
