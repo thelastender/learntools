@@ -138,7 +138,7 @@ def m2():
     tt2 = t1 - tt1 * 10
     o = '小' if random.random() < 0.5 else '大'
     s = ["[ ]" + str(tt2) + " x " + str(t2) + "的积是" + str(r) + "，[ ]中填(     )是正确的"]
-    s.append("    A. " + str(tt1) + "  B. " + str(tt1 - 1) + "  C. " + str(tt1 + 1))
+    s.append("    A. " + str(tt1) + "  B. " + str(tt1 - 1 if tt1 - 1 >= 0 else tt1 + 2) + "  C. " + str(tt1 + 1))
     return s
 
 def eq1():
@@ -213,3 +213,4 @@ if __name__ == "__main__":
         t = sys.argv[1]
     fname = 'calculate-' + (datetime.datetime.now().strftime('%Y-%m-%d') if not t else t)
     export(fname, t)
+    
