@@ -86,6 +86,7 @@ def divide():
 # functions 
 
 def split1():
+    # 2022年11月20日不需要
     t1, t2, r, tt1 = multiple()
     s = ["写出下面计算方法的乘法算式：(              )"]
     l = "    " + str(tt1 * 10) + " x " + str(t2) + " = " + str(tt1 * 10 * t2) + ""
@@ -97,17 +98,30 @@ def split1():
 def split2():
     t1, t2, r, tt1 = multiple()
     tt2 = t1 - tt1 * 10
-    s = ["计算" + str(t1) + " x " + str(t2) + "时，下面算法正确的是（       ）。"]
-    p = []
-    p.append(str(tt1) + " x " + str(t2) + " + " + str(tt2) + " x " + str(t2))
-    p.append(str(tt1 * 10) + " x " + str(t2) + " + " + str(tt2) + " x " + str(t2))
-    p.append(str(tt1 * 10) + " + " + str(tt2) + " x " + str(t2))
-    random.shuffle(p)
-    prefix = ['A', 'B', 'C']
-    l = ""
-    for i in range(len(p)):
-        l += "    " + prefix[i] + ". " + p[i] + ""
-    s.append(l)
+    if random.random() < 0.5:
+        s = ["计算" + str(t1) + " x " + str(t2) + "时，下面算法正确的是（       ）。"]
+        p = []
+        p.append(str(tt1) + " x " + str(t2) + " + " + str(tt2) + " x " + str(t2))
+        p.append(str(tt1 * 10) + " x " + str(t2) + " + " + str(tt2) + " x " + str(t2))
+        p.append(str(tt1 * 10) + " + " + str(tt2) + " x " + str(t2))
+        random.shuffle(p)
+        prefix = ['A', 'B', 'C']
+        l = ""
+        for i in range(len(p)):
+            l += "    " + prefix[i] + ". " + p[i] + ""
+        s.append(l)
+    else:
+        s = ["计算" + str(t1) + " x " + str(t2) + "时，下面算法错误的是（       ）。"]
+        p = []
+        p.append(str(tt1) + " x " + str(t2) + " + " + str(tt2) + " x " + str(t2))
+        p.append(str(tt1 * 10) + " x " + str(t2) + " + " + str(tt2) + " x " + str(t2))
+        p.append(str(t1) + " x " + str(t2))
+        random.shuffle(p)
+        prefix = ['A', 'B', 'C']
+        l = ""
+        for i in range(len(p)):
+            l += "    " + prefix[i] + ". " + p[i] + ""
+        s.append(l)
     return s
 
 def compare():
@@ -121,7 +135,9 @@ def compare():
 
 def zeros():
     _, t2, _, tt1 = multiple()
-    return [str(tt1 * 10) + " x " + str(t2) + "的积的末尾有(      )个0"]
+    t2 = random.choice([2, 4, 6, 8])
+    tt1 = random.randint(1, 9)
+    return [str(tt1 * 100 + 5 * 10) + " x " + str(t2) + "的积的末尾有(      )个0"]
 
 def mdpm():
     f = {multiple : 'x', divide: '÷', plus : '+', minus : '-'}
@@ -136,9 +152,28 @@ def mdpm():
 def m2():
     t1, t2, r, tt1 = multiple()
     tt2 = t1 - tt1 * 10
-    o = '小' if random.random() < 0.5 else '大'
-    s = ["[ ]" + str(tt2) + " x " + str(t2) + "的积是" + str(r) + "，[ ]中填(     )是正确的"]
-    s.append("    A. " + str(tt1) + "  B. " + str(tt1 - 1 if tt1 - 1 >= 0 else tt1 + 2) + "  C. " + str(tt1 + 1))
+    p = []
+    if random.random() < 0.5:
+        s = ["[ ]" + str(tt2) + " x " + str(t2) + "的积是" + str(r) + "，[ ]中填(     )是正确的"]
+        p.append(str(tt1))
+        p.append(str(tt1 - 1 if tt1 - 1 >= 0 else tt1 + 2))
+        p.append(str(tt1 + 1))
+    else:
+        rrr = int(r / 10)
+        if rrr > 0:
+            s = ["" + str(int(r / 10)) + "[ ] ÷ " + str(t2) + "的商是" + str(t1) + "，[ ]中填的(      )是正确的"]
+        else:
+            s = ["" + "[ ] ÷ " + str(t2) + "的商是" + str(t1) + "，[ ]中填的(      )是正确的"]
+        rr = r - rrr * 10
+        p.append(str(rr))
+        p.append(str(rr - 1 if rr - 1 >= 0 else rr + 2))
+        p.append(str(rr + 1))
+    prefix = ['A', 'B', 'C']
+    random.shuffle(p)
+    ss = ""
+    for i in range(len(prefix)):
+        ss += "    " + prefix[i] + ". " + p[i]
+    s.append(ss)
     return s
 
 def eq1():
@@ -190,7 +225,7 @@ def export(fname, t = None):
     c.drawString(width / 2 - len(title) * character_step / 2, top, title)
     # content
     c.setFontSize(content_font_size)
-    f = [split1, split2, eq1, eq2, compare, zeros, mdpm, m2, mdpm, eq2] * 2
+    f = [eq1, split2, eq1, eq2, compare, zeros, mdpm, m2, mdpm, eq2] * 2
     random.shuffle(f)
     i = 1
     j = 1
@@ -213,4 +248,3 @@ if __name__ == "__main__":
         t = sys.argv[1]
     fname = 'calculate-' + (datetime.datetime.now().strftime('%Y-%m-%d') if not t else t)
     export(fname, t)
-    
