@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 
-import os, io, sys
+import os, io, sys, random
 
 fn = os.getcwd() + os.sep + 'pinyin.dict'
 fn2 = os.getcwd() + os.sep + 'pinyin2.dict'
@@ -29,7 +29,7 @@ def translate():
         for k, v in dd.items():
             f.write(('%s=%s' % (k, v)) + '\n')
 
-def process(inputfile):
+def process(inputfile, shuffle = False):
     s = []
     with io.open(inputfile, 'r', encoding='utf-8') as f:
         l = f.readline()
@@ -43,6 +43,8 @@ def process(inputfile):
                     ss.append(d.get(ll, ll))
                 s.append(ss)
             l = f.readline()
+    if shuffle:
+        random.shuffle(s)
     return s
 
 def gen(title, s, output):
@@ -63,18 +65,19 @@ def gen(title, s, output):
     c.setFontSize(14)
     i = 0
     word_step = 15 * mm
-    character_step = 15 * mm
+    character_step = 18 * mm
     line_step = 25 * mm
     margin_top = 30 * mm
     margin_left = 15 * mm
     padding = 2 * mm
     x = margin_left
     y = margin_top
+    count = 0
     while i < len(s):
         if x + len(s[i]) * character_step > width - margin_left:
             y = y + line_step
             x = margin_left
-            if y > height - margin_top:
+            if y > height - margin_top or count > 45:
                 y = margin_top
                 c.showPage()
                 page = page + 1
@@ -82,9 +85,11 @@ def gen(title, s, output):
                 c.setFontSize(20)
                 c.drawString(width / 2 - 15 * mm, top, '%s %d' % (outputname, page))
                 c.setFontSize(14)
+                count = 0
         j = 0
         while j < len(s[i]):
             k = s[i][j]
+            count = count + 1
             c.drawString(x + padding, y, k)
             c.rect(x, y + padding, character_step, character_step)
             # print(k, x / mm)
@@ -102,7 +107,7 @@ if __name__ == '__main__':
 
     # translate()
     init()
-    s = process(inputname)
+    s = process(inputname, True)
     print("There are", len(s), 'words.')
     gen(outputname, s, outputname)
 

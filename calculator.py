@@ -4,13 +4,72 @@
 import random
 import datetime
 import sys
+from functools import reduce
 
-def calculate(r, min_num, max_num, op = '+'):
+def operator_priority(op1, op2):
+    if op1 in ('+', '-'):
+        if op2 in ('+', '-'):
+            return 0
+        else:
+            return -1
+    else:
+        if op2 in ('+', '-'):
+            return 1
+        else:
+            return 0
+
+def is_prime(n):
+    """ 判断是否是素数
+    """
+    if n == 1:
+        return True
+    i = 2
+    while i * i <= n:
+        if n % i == 0:
+            return False
+        i = i + 1
+    return True
+
+def resolve(x):
+    """ 质因式分解
+    """
+    if x <= 1:
+        return [1]
+    result = []
+    while x > 1:
+        if is_prime(x):
+            result.append(x)
+            if len(result) == 1:
+                result.append(1)
+            break
+        i = 2
+        while i * i <= x:
+            if x % i == 0 and is_prime(i):
+                result.append(int(i))
+                x = int(x / i)
+                break
+            i = i + 1
+    return result
+
+def resolve_two(r, min_num, max_num, op = '+'):
     t1 = 0
     t2 = 0
     if op == '-':
         t1 = random.randint(r + 1, max(max_num, r + 1))
         t2 = t1 - r
+    elif op == 'x':
+        ps = resolve(r)
+        ps1 = ps[0:int(len(ps) / 2)]
+        ps2 = ps[int(len(ps) / 2):]
+        if len(ps) > 2:
+            t1 = reduce(lambda x, y: x * y, ps1)
+            t2 = reduce(lambda x, y: x * y, ps2)
+        else:
+            t1 = ps[0]
+            t2 = ps[1]
+    elif op == '÷':
+        t2 = random.randint(max(1, min_num), min(9, max_num))
+        t1 = t2 * r
     else:
         t1 = random.randint(1, min(r - 1, max_num))
         t2 = r - t1
@@ -25,7 +84,7 @@ def equation(min_num, max_num, parameter_count):
     replaced = False
     while i >= 2:
         op = '+' if random.random() < 0.5 else '-'
-        t1, t2, _, op = calculate(r, min_num, max_num, op)
+        t1, t2, _, op = resolve_two(r, min_num, max_num, op)
         # print(t1, op, t2, r)
         i = i - 1
         if len(s) > pos:
@@ -62,11 +121,11 @@ def equation(min_num, max_num, parameter_count):
     return l + " = " + str(rr)
 
 def plus():
-    t1, t2, r, _ = calculate(random.randint(11, 999), 11, 999, '+')
+    t1, t2, r, _ = resolve_two(random.randint(11, 999), 11, 999, '+')
     return t1, t2, r, 0
 
 def minus():
-    t1, t2, r, _ = calculate(random.randint(11, 999), 11, 999, '-')
+    t1, t2, r, _ = resolve_two(random.randint(11, 999), 11, 999, '-')
     return t1, t2, r, 0
 
 def multiple():
@@ -127,10 +186,24 @@ def split2():
 def compare():
     f = {multiple : 'x', divide: '÷', plus : '+', minus : '-'}
     f1 = random.choice(list(f.keys()))
-    f2 = random.choice(list(f.keys()))
     x1, y1, _, _ = f1()
-    x2, y2, _, _ = f2()
-
+    if f[f1] == 'x':
+        x2 = x1 - 1
+        y2 = y1 + 1
+        f2 = multiple
+    elif f[f1] == '÷':
+        x2 = x1 + y1
+        y2 = y1 + 1
+        f2 = divide
+    elif f[f1] == '+':
+        x2, y2, _, _ = resolve_two(x1 + y1, 1, 999)
+        x2 = max(1, x2 + random.randint(-5, 5))
+        y2 = max(1, y2 + random.randint(-5, 5))
+        f2 = plus
+    else:
+        y2, _, _, _ = resolve_two(x1, 1, 999)
+        x2 = max(x1 - y2 + random.randint(-5, 5), 1)
+        f2 = minus
     return ["比大小：" + str(x1) + " " + f[f1] + " " + str(y1) + " [ ] " + str(x2) + " " + f[f2] + " " + str(y2)]
 
 def zeros():
@@ -177,13 +250,49 @@ def m2():
     return s
 
 def eq1():
-    return ["填空：" + equation(11, 999, 3)]
+    f = {multiple : 'x', divide: '÷', plus : '+', minus : '-'}
+    f1 = random.choice(list(f.keys()))
+    t1, t2, r, _ = f1()
+
+    k = random.randint(1, 3)
+    s = ""
+    if random.random() < 0.5:
+        #print("t1", t1, t2, r)
+        x, y, _, op = resolve_two(t1, 1, 999, random.choice(('+', '-', 'x', '÷')))
+        l = [x, y, t2]
+        o = [" " + op + " ", " " + f[f1] + " ", " = " + str(r)]
+        for i in range(len(l)):
+            if i == 0 and operator_priority(op, f[f1]) < 0:
+                s += "("
+            if i + 1 == k:
+                s += "(      )"
+            else:
+                s += str(l[i])
+            if i == 1 and operator_priority(op, f[f1]) < 0:
+                s += ")"
+            s += o[i]
+    else:
+        #print("t2", t1, t2, r)
+        x, y, _, op = resolve_two(t2, 1, 999, random.choice(('+', '-', 'x', '÷')))
+        l = [t1, x, y]
+        o = [" " + f[f1] + " ", " " + op + " ", " = " + str(r)]
+        for i in range(len(l)):
+            if i == 1 and operator_priority(f[f1], op) > 0:
+                s += "("
+            if i + 1 == k:
+                s += "(      )"
+            else:
+                s += str(l[i])
+            if i == 2 and operator_priority(f[f1], op) > 0:
+                s += ")"
+            s += o[i]
+    return ["填空：" + s]
 
 def eq2():
     f = {multiple : 'x', divide: '÷', plus : '+', minus : '-'}
     f1 = random.choice(list(f.keys()))
     t1, t2, r, _ = f1()
-    x, y, _, op = calculate(t1, 1, 999, '+' if random.random() < 0.5 else '-')
+    x, y, _, op = resolve_two(t1, 1, 999, random.choice(('+', '-', 'x', '÷')))
     s = ["下面哪个算式的得数是" + str(r) + "，请选择(      )"]
     l = "    A. " + str(x) + " " + op + " " + str(y) + " " + f[f1] + " " + str(t2) + "    " 
     opposite = {'+': '-', '-': '+', 'x': '+', '÷': '-'}
@@ -194,11 +303,16 @@ def eq2():
             l += "B. " + str(x) + " " + opposite[op] + " (" + str(y) + " " + f[f1] + " " + str(t2) + ")" + "    " 
         l += "C. " + str(x) + " " + op + " " + str(y) + " " + opposite[f[f1]] + " " + str(t2)
     else:
-        l += "B. (" + str(x) + " " + op + " " + str(y) + ") " + f[f1] + " " + str(t2) + "    " 
+        if op == 'x' or op == '÷':
+            l += "B. " + str(x) + " " + opposite[op] + " " + str(y) + " " + f[f1] + " " + str(t2) + "" + "    " 
+        else: 
+            l += "B. (" + str(x) + " " + op + " " + str(y) + ") " + f[f1] + " " + str(t2) + "    " 
         l += "C. " + str(x) + " " + op + " " + str(y) + " " + opposite[f[f1]] + " " + str(t2)
     s.append(l)
     return s
 
+def times():
+    pass
 
 def export(fname, t = None):
     from reportlab.pdfbase import pdfmetrics
@@ -225,7 +339,7 @@ def export(fname, t = None):
     c.drawString(width / 2 - len(title) * character_step / 2, top, title)
     # content
     c.setFontSize(content_font_size)
-    f = [eq1, split2, eq1, eq2, compare, zeros, mdpm, m2, mdpm, eq2] * 2
+    f = [eq1, eq1, eq1, eq2, compare, compare, mdpm, eq1, mdpm, eq2] * 2
     random.shuffle(f)
     i = 1
     j = 1
@@ -248,3 +362,4 @@ if __name__ == "__main__":
         t = sys.argv[1]
     fname = 'calculate-' + (datetime.datetime.now().strftime('%Y-%m-%d') if not t else t)
     export(fname, t)
+    
