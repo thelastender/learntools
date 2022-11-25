@@ -201,8 +201,9 @@ def compare():
         y2 = max(1, y2 + random.randint(-5, 5))
         f2 = plus
     else:
-        y2, _, _, _ = resolve_two(x1, 1, 999)
-        x2 = max(x1 - y2 + random.randint(-5, 5), 1)
+        x2, y2, _, _ = resolve_two(x1 - y1, 1, 999, '-')
+        x2 = max(x2 + random.randint(-5, 5), 1)
+        y2 = max(y2 + random.randint(-5, 5), 1)
         f2 = minus
     return ["比大小：" + str(x1) + " " + f[f1] + " " + str(y1) + " [ ] " + str(x2) + " " + f[f2] + " " + str(y2)]
 
@@ -339,7 +340,7 @@ def export(fname, t = None):
     c.drawString(width / 2 - len(title) * character_step / 2, top, title)
     # content
     c.setFontSize(content_font_size)
-    f = [eq1, eq1, eq1, eq2, compare, compare, mdpm, eq1, mdpm, eq2] * 2
+    f = [eq1, eq1, eq1, eq1, eq1, eq1, mdpm, eq1, mdpm, eq1] * 2
     random.shuffle(f)
     i = 1
     j = 1
