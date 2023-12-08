@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 
@@ -107,10 +107,7 @@ if __name__ == '__main__':
 
     # translate()
     init()
-    s = process(inputname, True)
+    s = process(inputname, False)
     print("There are", len(s), 'words.')
     gen(outputname, s, outputname)
 
-    
-
-    
